@@ -38,11 +38,12 @@ As soon as the server got the both `READY` signals, it begins the game.
 
 ## Game Details
 
-The server sends the state of the game in the following format:
+User sends a request to the server to get the game state, and the server
+sends the state of the game back to the client in the following format:
 
 ```
-< STATE
-< {"you": {"pos": 0}, "opponent": {"pos": 0}, "ball": {"pos": {"x": 0, y: "0"}}}
+> STATE
+< {"status": "PLAYING", "result": {"you": {"pos": 0}, "opponent": {"pos": 0}, "ball": {"pos": {"x": 0, y: "0"}}}}
 ```
 
 ## User Actions
@@ -57,30 +58,39 @@ User can move its paddle up or down. Correspoding commands are:
 ## End of the Game
 
 If one of the user missed the ball, the game is stopped and the
-information about the result is being sent to the users:
+information about the result is being sent to the users as a result of
+the `STATE` command response.
 
 ```
-< GAMEOVER
-< {"status": "loser", "score": {"you": 0, "opponent": 1}}
+> STATE
+< {"status": "GAMEOVER", "result": {"status": "loser", "score": {"you": 0, "opponent": 1}}}
 ```
 
 After that the server switches to the waiting mode and waits for the
 `READY` signals from the users.
+
+## States of the Game
+
+There are three states of the game:
+
+* NEW
+* PLAYING
+* GAMEOVER
 
 ## The Example of the Connection
 
 ```
 < OK
 > READY
-< STATE
-< {"you": {"pos": 0}, "opponent": {"pos": 0}, "ball": {"pos": {"x": 0, y: "0"}}}
+> STATE
+< {"status": "PLAYING", "result": {"you": {"pos": 0}, "opponent": {"pos": 0}, "ball": {"pos": {"x": 0, y: "0"}}}}
 < ...
 < ...
 > UP
 > UP
-< STATE
-< {"you": {"pos": 50}, "opponent": {"pos": -30}, "ball": {"pos": {"x": 100, y: "20"}}}
+> STATE
+< {"status": "PLAYING", "result": {"you": {"pos": 50}, "opponent": {"pos": -30}, "ball": {"pos": {"x": 100, y: "20"}}}}
 < ...
 < GAMEOVER
-< {"status": "loser", "score": {"you": 0, "opponent": 1}}
+< {"status": "GAMEOVER", "result": {"status": "loser", "score": {"you": 0, "opponent": 1}}}
 ```
