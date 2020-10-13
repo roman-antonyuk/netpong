@@ -69,9 +69,9 @@ the `STATE` command response.
 After that the server switches to the waiting mode and waits for the
 `READY` signals from the users.
 
-## States of the Game
+## Statuses of the Game
 
-There are three states of the game:
+There are three statuses of the game:
 
 * NEW
 * PLAYING
