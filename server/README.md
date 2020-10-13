@@ -1,5 +1,14 @@
 # NetPong Server
 
+## Download
+
+Clone the repository and go to the server directory:
+
+```bash
+git clone git@github.com:roman-antonyuk/netpong.git
+cd netpong/server
+```
+
 ## Install
 
 Initialize python3 virtual environment and dependencies:
@@ -14,8 +23,6 @@ pip install -r requirements.txt
 Activate the environment and run the main file:
 
 ```bash
-cd $PROJECT_DIR/server
 source env/bin/activate
-
 python main.py
 ```
