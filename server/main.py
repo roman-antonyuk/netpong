@@ -19,32 +19,48 @@ STATUS_GAMEOVER = "GAMEOVER"
 class NullPlayer:
     def __init__(self):
         self.is_ready = False
-        self.paddle_pos = 0
+        self.paddle_pos = 0.0
         self.paddle_size = 250
         self.score = 0
 
     def move_paddle(self, direction):
         pass
 
+    def reset(self):
+        pass
+
+
 NULL_PLAYER = NullPlayer()
+
 
 class Player:
     def __init__(self):
-        self.is_ready = False
-        self.paddle_pos = 0
-        self.paddle_size = 250
+        self.reset()
         self.score = 0
 
     def move_paddle(self, direction):
         self.paddle_pos += direction * PADDLE_STEP
 
+    def reset(self):
+        self.is_ready = False
+        self.paddle_pos = 0.0
+        self.paddle_size = 250
+
 
 class Ball:
     def __init__(self):
-        self.x = 0
-        self.y = 0
-        self.vx = 3
-        self.vy = 4
+        self.x = 0.0
+        self.y = 0.0
+        self.vx = 3.0
+        self.vy = 4.0
+
+    def inverse(self):
+        ball = Ball()
+        ball.x = -self.x
+        ball.y = self.y
+        ball.vx = -self.vx
+        ball.vy = self.vy
+        return ball
 
     def move(self):
         self.x += self.vx
@@ -76,36 +92,54 @@ class Game:
             self.player2 = NULL_PLAYER
         self.status = STATUS_NEW
 
+    def ball_for(self, player):
+        return player == self.player1 and self.ball.inverse() or self.ball
+
     def ready(self, player):
         player.is_ready = True
-        if self.player1.is_ready and self.player2.is_ready and self.status == STATUS_NEW:
+        if self.player1.is_ready and self.player2.is_ready and self.status != STATUS_PLAYING:
             print("Start playing")
             self.ball = Ball()
-            self.player1.paddle_pos = 0
-            self.player2.paddle_pos = 0
+            self.player1.reset()
+            self.player2.reset()
             self.status = STATUS_PLAYING
 
+    def gameover(self, winner):
+        self.status = STATUS_GAMEOVER
+        winner.score += 1
+
+    def opponent(self, player):
+        return player == self.player1 and self.player2 or self.player1
+
     def tick(self):
-        # print("Ticking...")
         if self.status == STATUS_PLAYING:
+            size = 1000.0
+
+            (x0, y0) = (self.ball.x, self.ball.y)
             self.ball.move()
+            (x1, y1) = (self.ball.x, self.ball.y)
             print(f"Ball: {self.ball.x}, {self.ball.y}")
-            if self.ball.x < 0:
-                self.ball.x = -self.ball.x
-                self.ball.vx *= -1
-            elif self.ball.x > 1000:
-                self.ball.x = 2000 - self.ball.x
-                self.ball.vx *= -1
-            if self.ball.y < 0:
-                self.ball.y = -self.ball.y
+
+            def check_hit_paddle(player, border_x):
+                hit_y = (y0 - y1)/(x0 - x1) * border_x + (y0 - ((y0 - y1)/(x0 - x1) * x0))
+                if -player.paddle_size/2 <= hit_y - player.paddle_pos <= player.paddle_size/2:
+                    self.ball.x = 2 * border_x - self.ball.x
+                    self.ball.vx *= -1
+                else:
+                    self.gameover(self.opponent(player))
+
+            if self.ball.y < -size/2:
+                self.ball.y = -size - self.ball.y
                 self.ball.vy *= -1
-            elif self.ball.y > 1000:
-                self.ball.y = 2000 - self.ball.y
+            elif self.ball.y > size/2:
+                self.ball.y = size - self.ball.y
                 self.ball.vy *= -1
 
             # handle hit paddles
-            # check if some player missed: score and go to GAMEOVER
-            pass
+            if self.ball.x < -size/2:
+                check_hit_paddle(self.player1, -size/2)
+            elif self.ball.x > size/2:
+                check_hit_paddle(self.player2, size/2)
 
 
 game = Game()
@@ -156,13 +190,14 @@ class NetPongHandler(socketserver.StreamRequestHandler):
 
     def status(self, player):
         global game
-        opponent = player == game.player1 and game.player2 or game.player1
+        opponent = game.opponent(player)
+        ball = game.ball_for(player)
 
         self.say(json.dumps({
             "status": game.status,
             "ball": {
-                "x": game.ball.x,
-                "y": game.ball.y,
+                "x": ball.x,
+                "y": ball.y,
             },
             "you": {
                 "pos": player.paddle_pos,
