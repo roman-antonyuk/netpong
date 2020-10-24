@@ -184,6 +184,9 @@ class NetPongHandler(socketserver.StreamRequestHandler):
                 player.move_paddle(MOVE_UP)
             elif command == "DOWN":
                 player.move_paddle(MOVE_DOWN)
+            elif command == "KILL":
+                global main_server
+                main_server.shutdown()
 
     def say(self, message):
         self.wfile.write(bytes(f"{message}\n", "UTF-8"))
@@ -220,12 +223,18 @@ def get_ip():
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    pass
+    allow_reuse_address = True
+    daemon_threads = True
+
+
+main_server = None
 
 
 def listen():
     ip_address = get_ip()
     with ThreadedTCPServer((ip_address, SERVER_PORT), NetPongHandler) as server:
+        global main_server
+        main_server =  server
         server.serve_forever()
 
 
