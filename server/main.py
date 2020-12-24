@@ -154,6 +154,7 @@ class NetPongHandler(socketserver.StreamRequestHandler):
             self.send_error("SERVER_FULL")
             return
 
+        self.send_connected()
         try:
             print("Start playing")
             self.play(player)
@@ -169,11 +170,16 @@ class NetPongHandler(socketserver.StreamRequestHandler):
             }
         }))
 
+    def send_connected(self):
+        self.say(json.dumps({
+            "status": "NEW",
+        }))
+
     def play(self, player):
         while True:
             print("Obtaining command")
             command = self.rfile.readline().strip().decode("utf-8")
-            print("Command " + command)
+            print("Command [%s]" % command)
             if command == "QUIT":
                 break
             if command == "READY":
@@ -187,6 +193,8 @@ class NetPongHandler(socketserver.StreamRequestHandler):
             elif command == "KILL":
                 global main_server
                 main_server.shutdown()
+            else:
+                break
 
     def say(self, message):
         self.wfile.write(bytes(f"{message}\n", "UTF-8"))
