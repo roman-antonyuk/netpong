@@ -153,36 +153,10 @@ while not done:
     xb = int(screen_width/2 - status['ball']['x'] * screen_width / 1000)
     yb = int(screen_height/2 + status['ball']['y'] * screen_height / 1000)
 
-    if pressed[pygame.K_UP]:
-        paddle2_y = move_player(2, 1)
-        send_command('UP')
     if pressed[pygame.K_DOWN]:
-        paddle2_y = move_player(2, -1)
+        send_command('UP')
+    if pressed[pygame.K_UP]:
         send_command('DOWN')
-#    if pressed[pygame.K_w]:ш
-#        paddle1_y = move_player(1, 1)
-#    if pressed[pygame.K_s]:
-#        paddle1_y = move_player(1, -1)
-
-#    bspeedx = ballHitP(lkjhjkhkh, bspeedx, [paddle1_x, paddle1_y], [paddle2_x, paddle2_y], paddle_height)
-#    bspeedy = ballHitX(yb, bspeedy)
-
-#    (xb, yb) = move_ball()
-
-#    n = winP1(xb)
-#    m = winP2(xb)
-
-#    if n != False:
-#        yb = n[1]
-#        xb = n[0]
-#        bspeedx = n[2]
-#        bspeedy = n[3]
-
-#    if m != False:
-#        yb = m[1]
-#        xb = m[0]
-#        bspeedx = m[2]
-#        bspeedy = m[3]
 
     drawPlayer1(paddle1_x, paddle1_y, paddle_width, paddle_height)
     drawPlayer2(paddle2_x, paddle2_y, paddle_width, paddle_height)
