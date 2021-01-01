@@ -39,7 +39,8 @@ class Player:
         self.score = 0
 
     def move_paddle(self, direction):
-        self.paddle_pos += direction * PADDLE_STEP
+        if ((self.paddle_pos + direction * PADDLE_STEP) <= 375 and (self.paddle_pos + direction * PADDLE_STEP) >= -375): 
+            self.paddle_pos += direction * PADDLE_STEP
 
     def reset(self):
         self.is_ready = False
@@ -51,8 +52,8 @@ class Ball:
     def __init__(self):
         self.x = 0.0
         self.y = 0.0
-        self.vx = 3.0
-        self.vy = 4.0
+        self.vx = 9.0
+        self.vy = 12.0
 
     def inverse(self):
         ball = Ball()

@@ -13,17 +13,17 @@ screen_width, screen_height = pygame.display.get_surface().get_size()
 done = False
 
 paddle_height = screen_height // 4
-paddle_width = 50
+paddle_width = 15
 paddle1_y = (screen_height - paddle_height) // 2
-paddle1_x = 50
+paddle1_x = paddle_width
 paddle2_y = (screen_height - paddle_height) // 2
-paddle2_x = screen_width - 50
+paddle2_x = screen_width - paddle_width
 xb = screen_width // 2
 yb = screen_height // 2
 bspeedx = 25
 bspeedy = 25
-radius = 40
-speed = 25
+radius = 15
+speed = 250
 
 
 # Functions
@@ -62,11 +62,11 @@ def ballHitP(pos, sx, player1, player2, h):
 
 
 def drawPlayer1(x, y, l, h):
-    pygame.draw.rect(screen, (255, 0, 0), (x, y, -l, h), 0)
+    pygame.draw.rect(screen, (255, 0, 0), (x, y - h//2, -l, h), 0)
 
 
 def drawPlayer2(x, y, l, h):
-    pygame.draw.rect(screen, (0, 0, 255), (x, y, l, h), 0)
+    pygame.draw.rect(screen, (0, 0, 255), (x, y - h//2, l, h), 0)
 
 
 def drawBall(x, y, r):
@@ -150,7 +150,7 @@ while not done:
         continue
     paddle1_y = int(screen_height/2 + status['you']['pos'] * screen_height / 1000)
     paddle2_y = int(screen_height/2 + status['opponent']['pos'] * screen_height / 1000)
-    xb = int(screen_width/2 + status['ball']['x'] * screen_width / 1000)
+    xb = int(screen_width/2 - status['ball']['x'] * screen_width / 1000)
     yb = int(screen_height/2 + status['ball']['y'] * screen_height / 1000)
 
     if pressed[pygame.K_UP]:
